@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Email API Mailer for Cyberpanel">
+<ruleset name="REST Email API Mailer">
 	<description>WordPress Coding Standards ruleset for this plugin.</description>
 
 	<file>.</file>
@@ -43,7 +43,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="email-api-mailer-for-cyberpanel"/>
+				<element value="rest-email-api-mailer"/>
 			</property>
 		</properties>
 	</rule>

@@ -1,12 +1,12 @@
-# Email API Mailer for Cyberpanel
+# REST Email API Mailer
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![WordPress](https://img.shields.io/badge/WordPress-6.1%2B-0073aa.svg)](https://wordpress.org)
 [![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4.svg)](https://www.php.net)
 
-A WordPress plugin that replaces `wp_mail()` with the [Cyberpanel](https://cyberpanel.net) transactional email REST API. Includes smart delivery tracking, an account statistics dashboard and a graceful fallback to the default WordPress mailer.
+A WordPress plugin that replaces `wp_mail()` with delivery via the transactional email REST API hosted at `platform.cyberpersons.com` — the email service that ships with [Cyberpanel](https://cyberpanel.net) hosting. Includes smart delivery tracking, an account statistics dashboard and a graceful fallback to the default WordPress mailer.
 
-> **Disclaimer**: this is an independent, community-maintained project. It is **not affiliated with, endorsed by or sponsored by Cyberpanel** (cyberpanel.net) or its operators. "Cyberpanel" is used here only to describe the service the plugin connects to.
+> **Disclaimer**: this is an independent, community-maintained project. It is **not affiliated with, endorsed by or sponsored by Cyberpanel, CyberPersons LLC** (cyberpanel.net / cyberpersons.com) or any of their operators. "Cyberpanel" is referenced here only to describe the third-party email service the plugin connects to. All trademarks remain the property of their respective owners.
 
 ## Why this plugin exists
 
@@ -33,7 +33,7 @@ I run several WordPress sites on servers managed with Cyberpanel and wanted to u
 
 **From GitHub release:**
 
-1. Download the latest ZIP from the [Releases page](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/releases).
+1. Download the latest ZIP from the [Releases page](https://github.com/rafaelpessoap/rest-email-api-mailer/releases).
 2. In WordPress, go to **Plugins > Add New > Upload Plugin** and upload the ZIP.
 3. Activate the plugin.
 4. Open **Settings > Email API Mailer** and fill in your API key, sender email and sender name.
@@ -42,8 +42,8 @@ I run several WordPress sites on servers managed with Cyberpanel and wanted to u
 **From source:**
 
 ```bash
-git clone https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel.git
-cp -r email-api-mailer-for-cyberpanel /path/to/wp-content/plugins/
+git clone https://github.com/rafaelpessoap/rest-email-api-mailer.git
+cp -r rest-email-api-mailer /path/to/wp-content/plugins/
 ```
 
 ## Configuration via `wp-config.php`

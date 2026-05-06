@@ -1,26 +1,28 @@
-=== Email API Mailer for Cyberpanel ===
+=== REST Email API Mailer ===
 Contributors: rafaelzezao
-Tags: email, smtp, transactional email, cyberpanel, wp_mail
+Tags: email, smtp, transactional email, wp_mail, rest api
 Requires at least: 6.1
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.5
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Send WordPress emails through the Cyberpanel transactional email REST API with delivery tracking and account statistics.
+Replaces wp_mail() with delivery via a transactional email REST API (the one used by Cyberpanel hosting), with delivery tracking and account stats.
 
 == Description ==
 
-**Email API Mailer for Cyberpanel** replaces the default `wp_mail()` function so every transactional email your WordPress site sends (WooCommerce notifications, password resets, contact-form messages, custom plugin emails) is delivered through the Cyberpanel transactional email REST API instead of the server's default PHP mailer.
+**REST Email API Mailer** replaces the default `wp_mail()` function so every transactional email your WordPress site sends (WooCommerce notifications, password resets, contact-form messages, custom plugin emails) is delivered through a transactional email REST API hosted at `platform.cyberpersons.com` — the email service that ships with Cyberpanel hosting — instead of the server's default PHP mailer.
 
 I built this plugin after looking for a simple way to connect WordPress to the email service that ships with Cyberpanel and finding no existing plugin that did the job. I needed it for my own sites and decided to share it as open source so anyone running on Cyberpanel can benefit from the same integration.
 
-**This plugin is fully open source.** The source code, issue tracker and release history are public on GitHub: [https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel). Pull requests, bug reports and translations are welcome.
+**This is an independent, community-maintained plugin. It is not affiliated with, endorsed by or sponsored by Cyberpanel or CyberPersons LLC.** "Cyberpanel" is referenced in this readme only to describe the third-party email service the plugin connects to.
+
+**This plugin is fully open source.** The source code, issue tracker and release history are public on GitHub: [https://github.com/rafaelpessoap/rest-email-api-mailer](https://github.com/rafaelpessoap/rest-email-api-mailer). Pull requests, bug reports and translations are welcome.
 
 = Main features =
 
-* **wp_mail() override** — every email leaving WordPress (WooCommerce, forms, notifications, custom plugins) goes through the Cyberpanel API.
+* **wp_mail() override** — every email leaving WordPress (WooCommerce, forms, notifications, custom plugins) goes through the configured REST API.
 * **Smart delivery tracking** — after each send, the plugin schedules a single WP-Cron event to check whether the message was actually delivered, rechecking every 3 minutes until confirmation, bounce, timeout (20 retries) or expiration (48 hours).
 * **Account statistics dashboard** — displays your plan, monthly limit, emails sent/remaining, reputation score, rate limits, verified domains and monthly engagement (delivered, bounced, opened, clicked).
 * **Colored activity log** — history of the last 30 events: SENT (blue), DELIVERED (green), ERROR/BOUNCE (red), EXPIRED/TIMEOUT (yellow).
@@ -38,20 +40,20 @@ When enabled, the plugin sends the following data to `platform.cyberpersons.com`
 
 The plugin lives on GitHub and is developed in the open:
 
-* **Source code and releases**: [github.com/rafaelpessoap/email-api-mailer-for-cyberpanel](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel)
-* **Bug reports and feature requests**: [github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/issues](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/issues)
-* **Security disclosures**: see [SECURITY.md](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/blob/main/SECURITY.md) — please use GitHub's private vulnerability reporting rather than opening a public issue.
-* **Contributing guide**: see [CONTRIBUTING.md](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/blob/main/CONTRIBUTING.md) for coding standards, how to add a translation, and how releases are cut.
+* **Source code and releases**: [github.com/rafaelpessoap/rest-email-api-mailer](https://github.com/rafaelpessoap/rest-email-api-mailer)
+* **Bug reports and feature requests**: [github.com/rafaelpessoap/rest-email-api-mailer/issues](https://github.com/rafaelpessoap/rest-email-api-mailer/issues)
+* **Security disclosures**: see [SECURITY.md](https://github.com/rafaelpessoap/rest-email-api-mailer/blob/main/SECURITY.md) — please use GitHub's private vulnerability reporting rather than opening a public issue.
+* **Contributing guide**: see [CONTRIBUTING.md](https://github.com/rafaelpessoap/rest-email-api-mailer/blob/main/CONTRIBUTING.md) for coding standards, how to add a translation, and how releases are cut.
 
 Every release shipped to this directory is mirrored verbatim on the GitHub Releases page so you can always inspect the exact source behind any installed version.
 
 = Disclaimer =
 
-This plugin is an independent, open-source integration. It is **not affiliated with, endorsed by or sponsored by Cyberpanel** (cyberpanel.net) or its operators. "Cyberpanel" is used here only to describe the service this plugin connects to.
+This plugin is an independent, open-source integration. It is **not affiliated with, endorsed by or sponsored by Cyberpanel, CyberPersons LLC** (cyberpanel.net / cyberpersons.com) or any of their operators. "Cyberpanel" is referenced here only to describe the third-party email service this plugin connects to. All trademarks remain the property of their respective owners.
 
 == Installation ==
 
-1. Upload the `email-api-mailer-for-cyberpanel` folder to `wp-content/plugins/`, or install the ZIP through **Plugins > Add New > Upload Plugin**.
+1. Upload the `rest-email-api-mailer` folder to `wp-content/plugins/`, or install the ZIP through **Plugins > Add New > Upload Plugin**.
 2. Activate the plugin from the **Plugins** screen.
 3. Go to **Settings > Email API Mailer**.
 4. Fill in:
@@ -99,6 +101,11 @@ Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file s
 
 == Changelog ==
 
+= 2.1.0 =
+* **Renamed plugin to "REST Email API Mailer" (slug `rest-email-api-mailer`)** to comply with the WordPress.org ownership guideline that bars third-party plugins from carrying a trademarked vendor name in their identity. Existing installs keep all their settings — internal option keys, cron events and the `CYBERPANEL_EMAIL_API_KEY` constant are preserved as-is, so the upgrade is transparent.
+* Plugin URI now points to the renamed GitHub repository at `https://github.com/rafaelpessoap/rest-email-api-mailer` (the previous URL still redirects automatically).
+* Updated all admin-visible labels and screenshots references to the new plugin name. Functional descriptions still mention the third-party email service the plugin integrates with, with a clear "not affiliated with" disclaimer.
+
 = 2.0.5 =
 * Boolean option sanitizer now uses `rest_sanitize_boolean()` instead of a plain PHP cast, so submitted strings like `"false"` are stored as the boolean `false` rather than the truthy string.
 * Removed the `WP_CONTENT_DIR` fallback in the log path resolver and dropped the legacy v1.x log cleanup that referenced `WP_CONTENT_DIR`. The plugin now relies solely on `wp_upload_dir()` to determine where to write its log directory, matching WordPress.org guidelines for determining content locations.
@@ -114,7 +121,7 @@ Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file s
 
 = 2.0.2 =
 * Added a **Settings** shortcut on the Plugins list page, next to Activate/Deactivate, for faster access to the plugin configuration.
-* Fixed the Brazilian Portuguese translation of the plugin name that was left at the pre-rename value ("Cyberpanel API Email para WordPress"). Now correctly shows as "Email API Mailer para Cyberpanel".
+* Fixed a stale Brazilian Portuguese translation of the plugin display name (a leftover value from a previous rename was still being shown to pt_BR users).
 
 = 2.0.1 =
 * Bumped "Tested up to" from 6.7 to 6.9 for current WordPress eligibility.
@@ -123,7 +130,7 @@ Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file s
 * Readability cleanup in the dashboard rendering.
 
 = 2.0.0 =
-* Renamed plugin to "Email API Mailer for Cyberpanel" and published as open source.
+* Renamed plugin and published as open source.
 * English source strings with bundled Brazilian Portuguese translation (pt_BR).
 * Security hardening: capability checks on every admin action, nonces, `wp_unslash()` on all superglobals, sanitize callbacks on every registered option, use of `wp_safe_redirect()` for post-action redirects, escaping on every output.
 * Logs moved from `wp-content/cyberpersons-mailer.log` to a protected directory under `wp-content/uploads/cyberpanel-email/` with `.htaccess`, `web.config` and `index.php` guards.
@@ -143,4 +150,4 @@ Major security and i18n release. Your previous settings are migrated automatical
 
 This plugin transmits the content of your outgoing emails (sender, recipient, subject, message body) to the Cyberpanel email platform at `platform.cyberpersons.com` for the sole purpose of delivering those emails, and fetches back their delivery status for display in the admin panel. Refer to the Cyberpanel privacy policy at https://cyberpanel.net for details on how that service processes the data.
 
-No data is sent to the plugin author, to GitHub or to any other third party. All source code can be audited at [github.com/rafaelpessoap/email-api-mailer-for-cyberpanel](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel).
+No data is sent to the plugin author, to GitHub or to any other third party. All source code can be audited at [github.com/rafaelpessoap/rest-email-api-mailer](https://github.com/rafaelpessoap/rest-email-api-mailer).

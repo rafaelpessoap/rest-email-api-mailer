@@ -1,27 +1,27 @@
 <?php
 /**
- * Plugin Name:       Email API Mailer for Cyberpanel
- * Plugin URI:        https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel
- * Description:       Send WordPress emails through the Cyberpanel transactional email REST API, replacing the default wp_mail(). Includes smart delivery tracking, account statistics dashboard, and graceful fallback to the standard PHP mailer when disabled. Not affiliated with Cyberpanel.
- * Version:           2.0.5
+ * Plugin Name:       REST Email API Mailer
+ * Plugin URI:        https://github.com/rafaelpessoap/rest-email-api-mailer
+ * Description:       Replaces the default wp_mail() with delivery via the transactional email REST API hosted at platform.cyberpersons.com (the email service used by Cyberpanel hosting). Includes smart delivery tracking, account statistics dashboard, and graceful fallback to the standard PHP mailer when disabled. Independent open-source plugin — not affiliated with, endorsed by or sponsored by Cyberpanel or CyberPersons LLC.
+ * Version:           2.1.0
  * Author:            Rafael Pessoa
  * Author URI:        https://arsenalcraft.com.br
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       email-api-mailer-for-cyberpanel
+ * Text Domain:       rest-email-api-mailer
  * Domain Path:       /languages
  * Requires at least: 6.1
  * Tested up to:      6.9
  * Requires PHP:      7.4
  *
- * @package Email_API_Mailer_For_Cyberpanel
+ * @package REST_Email_API_Mailer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
+if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 
 	/**
 	 * Main plugin class.
@@ -29,10 +29,10 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 	 * Singleton that wires up admin UI, settings, email sending, delivery
 	 * tracking cron and logging.
 	 */
-	final class Cyberpanel_Email_API {
+	final class REST_Email_API_Mailer {
 
-		const VERSION      = '2.0.5';
-		const TEXT_DOMAIN  = 'email-api-mailer-for-cyberpanel';
+		const VERSION      = '2.1.0';
+		const TEXT_DOMAIN  = 'rest-email-api-mailer';
 		const API_BASE     = 'https://platform.cyberpersons.com/email/v1';
 		const SLUG         = 'cyberpanel-api-email';
 		const CAP          = 'manage_options';
@@ -49,14 +49,14 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 		/**
 		 * Singleton instance.
 		 *
-		 * @var Cyberpanel_Email_API|null
+		 * @var REST_Email_API_Mailer|null
 		 */
 		private static $instance = null;
 
 		/**
 		 * Get the singleton instance.
 		 *
-		 * @return Cyberpanel_Email_API
+		 * @return REST_Email_API_Mailer
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {
@@ -97,7 +97,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 			$settings_link = sprintf(
 				'<a href="%s">%s</a>',
 				esc_url( $settings_url ),
-				esc_html__( 'Settings', 'email-api-mailer-for-cyberpanel' )
+				esc_html__( 'Settings', 'rest-email-api-mailer' )
 			);
 			array_unshift( $links, $settings_link );
 			return $links;
@@ -255,8 +255,8 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 		 */
 		public function add_admin_menu() {
 			add_options_page(
-				__( 'Email API Mailer', 'email-api-mailer-for-cyberpanel' ),
-				__( 'Email API Mailer', 'email-api-mailer-for-cyberpanel' ),
+				__( 'Email API Mailer', 'rest-email-api-mailer' ),
+				__( 'Email API Mailer', 'rest-email-api-mailer' ),
 				self::CAP,
 				self::SLUG,
 				array( $this, 'settings_page' )
@@ -320,7 +320,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 				add_settings_error(
 					self::OPT_API_KEY,
 					'invalid_api_key',
-					__( 'The API key contains invalid characters.', 'email-api-mailer-for-cyberpanel' )
+					__( 'The API key contains invalid characters.', 'rest-email-api-mailer' )
 				);
 				return (string) get_option( self::OPT_API_KEY, '' );
 			}
@@ -346,7 +346,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 		 */
 		public function settings_page() {
 			if ( ! current_user_can( self::CAP ) ) {
-				wp_die( esc_html__( 'You do not have permission to access this page.', 'email-api-mailer-for-cyberpanel' ) );
+				wp_die( esc_html__( 'You do not have permission to access this page.', 'rest-email-api-mailer' ) );
 			}
 
 			$api_key_from_constant = defined( 'CYBERPANEL_EMAIL_API_KEY' ) && '' !== CYBERPANEL_EMAIL_API_KEY;
@@ -374,7 +374,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 			}
 			?>
 			<div class="wrap">
-				<h1><?php esc_html_e( 'Email API Mailer for Cyberpanel', 'email-api-mailer-for-cyberpanel' ); ?></h1>
+				<h1><?php esc_html_e( 'REST Email API Mailer', 'rest-email-api-mailer' ); ?></h1>
 
 				<?php if ( $notice_type && $notice_msg ) : ?>
 					<div class="notice notice-<?php echo 'success' === $notice_type ? 'success' : 'error'; ?> is-dismissible">
@@ -388,79 +388,79 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 					<?php settings_fields( 'cyberpanel_email' ); ?>
 					<table class="form-table" role="presentation">
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Enable', 'email-api-mailer-for-cyberpanel' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Enable', 'rest-email-api-mailer' ); ?></th>
 							<td>
 								<label>
 									<input type="checkbox" name="<?php echo esc_attr( self::OPT_ENABLED ); ?>" value="1" <?php checked( $enabled, true ); ?>>
-									<?php esc_html_e( 'Send emails through the Cyberpanel API', 'email-api-mailer-for-cyberpanel' ); ?>
+									<?php esc_html_e( 'Send emails through the Cyberpanel API', 'rest-email-api-mailer' ); ?>
 								</label>
-								<p class="description"><?php esc_html_e( 'When disabled, WordPress uses its default mailer (PHP mail / SMTP).', 'email-api-mailer-for-cyberpanel' ); ?></p>
+								<p class="description"><?php esc_html_e( 'When disabled, WordPress uses its default mailer (PHP mail / SMTP).', 'rest-email-api-mailer' ); ?></p>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'API Key', 'email-api-mailer-for-cyberpanel' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'API Key', 'rest-email-api-mailer' ); ?></th>
 							<td>
 								<?php if ( $api_key_from_constant ) : ?>
-									<p><code><?php esc_html_e( 'Defined via CYBERPANEL_EMAIL_API_KEY in wp-config.php', 'email-api-mailer-for-cyberpanel' ); ?></code></p>
+									<p><code><?php esc_html_e( 'Defined via CYBERPANEL_EMAIL_API_KEY in wp-config.php', 'rest-email-api-mailer' ); ?></code></p>
 								<?php else : ?>
 									<input type="password" name="<?php echo esc_attr( self::OPT_API_KEY ); ?>" value="<?php echo esc_attr( $api_key ); ?>" class="regular-text" autocomplete="new-password">
-									<p class="description"><?php esc_html_e( 'API key created in your Cyberpanel account. For extra security, define CYBERPANEL_EMAIL_API_KEY in wp-config.php instead of storing it in the database.', 'email-api-mailer-for-cyberpanel' ); ?></p>
+									<p class="description"><?php esc_html_e( 'API key created in your Cyberpanel account. For extra security, define CYBERPANEL_EMAIL_API_KEY in wp-config.php instead of storing it in the database.', 'rest-email-api-mailer' ); ?></p>
 								<?php endif; ?>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Sender Email', 'email-api-mailer-for-cyberpanel' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Sender Email', 'rest-email-api-mailer' ); ?></th>
 							<td>
 								<input type="email" name="<?php echo esc_attr( self::OPT_FROM_EMAIL ); ?>" value="<?php echo esc_attr( $from_email ); ?>" class="regular-text">
-								<p class="description"><?php esc_html_e( 'Default sender address (must belong to a verified domain on the Cyberpanel account).', 'email-api-mailer-for-cyberpanel' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Default sender address (must belong to a verified domain on the Cyberpanel account).', 'rest-email-api-mailer' ); ?></p>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Sender Name', 'email-api-mailer-for-cyberpanel' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Sender Name', 'rest-email-api-mailer' ); ?></th>
 							<td>
 								<input type="text" name="<?php echo esc_attr( self::OPT_FROM_NAME ); ?>" value="<?php echo esc_attr( $from_name ); ?>" class="regular-text">
-								<p class="description"><?php esc_html_e( 'Name displayed as the sender.', 'email-api-mailer-for-cyberpanel' ); ?></p>
+								<p class="description"><?php esc_html_e( 'Name displayed as the sender.', 'rest-email-api-mailer' ); ?></p>
 							</td>
 						</tr>
 					</table>
-					<?php submit_button( __( 'Save Settings', 'email-api-mailer-for-cyberpanel' ) ); ?>
+					<?php submit_button( __( 'Save Settings', 'rest-email-api-mailer' ) ); ?>
 				</form>
 
 				<hr>
-				<h2><?php esc_html_e( 'Send Test Email', 'email-api-mailer-for-cyberpanel' ); ?></h2>
+				<h2><?php esc_html_e( 'Send Test Email', 'rest-email-api-mailer' ); ?></h2>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="cyberpanel_email_test">
 					<?php wp_nonce_field( 'cyberpanel_email_test' ); ?>
 					<table class="form-table" role="presentation">
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Recipient', 'email-api-mailer-for-cyberpanel' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Recipient', 'rest-email-api-mailer' ); ?></th>
 							<td>
 								<input type="email" name="test_to" value="<?php echo esc_attr( $current_user_email ); ?>" class="regular-text" required>
 							</td>
 						</tr>
 					</table>
-					<?php submit_button( __( 'Send Test', 'email-api-mailer-for-cyberpanel' ), 'secondary' ); ?>
+					<?php submit_button( __( 'Send Test', 'rest-email-api-mailer' ), 'secondary' ); ?>
 				</form>
 
 				<hr>
-				<h2><?php esc_html_e( 'Delivery Tracking', 'email-api-mailer-for-cyberpanel' ); ?></h2>
+				<h2><?php esc_html_e( 'Delivery Tracking', 'rest-email-api-mailer' ); ?></h2>
 				<p>
-					<strong><?php esc_html_e( 'Next check:', 'email-api-mailer-for-cyberpanel' ); ?></strong>
+					<strong><?php esc_html_e( 'Next check:', 'rest-email-api-mailer' ); ?></strong>
 					<?php
 					if ( $next_check ) {
 						echo esc_html( wp_date( 'd/m/Y H:i:s', $next_check ) );
 					} else {
-						esc_html_e( 'None scheduled (one will be created on the next email send).', 'email-api-mailer-for-cyberpanel' );
+						esc_html_e( 'None scheduled (one will be created on the next email send).', 'rest-email-api-mailer' );
 					}
 					?>
 					&nbsp;|&nbsp;
-					<strong><?php esc_html_e( 'Pending messages:', 'email-api-mailer-for-cyberpanel' ); ?></strong>
+					<strong><?php esc_html_e( 'Pending messages:', 'rest-email-api-mailer' ); ?></strong>
 					<?php echo (int) count( $pending ); ?>
 				</p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;">
 					<input type="hidden" name="action" value="cyberpanel_email_check_now">
 					<?php wp_nonce_field( 'cyberpanel_email_check_now' ); ?>
-					<?php submit_button( __( 'Check Now', 'email-api-mailer-for-cyberpanel' ), 'secondary', 'submit', false ); ?>
+					<?php submit_button( __( 'Check Now', 'rest-email-api-mailer' ), 'secondary', 'submit', false ); ?>
 				</form>
 
 				<?php $this->render_log(); ?>
@@ -475,7 +475,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 		 */
 		private function render_stats_panel( $stats ) {
 			if ( empty( $stats ) || empty( $stats['fetched_at'] ) ) {
-				echo '<div class="notice notice-info"><p>' . esc_html__( 'Account statistics are not yet available. They will be fetched during the next delivery check.', 'email-api-mailer-for-cyberpanel' ) . '</p></div>';
+				echo '<div class="notice notice-info"><p>' . esc_html__( 'Account statistics are not yet available. They will be fetched during the next delivery check.', 'rest-email-api-mailer' ) . '</p></div>';
 				return;
 			}
 
@@ -508,13 +508,13 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 			$fetched_str = wp_date( 'd/m/Y H:i', (int) $stats['fetched_at'] );
 			?>
 			<div style="background:#fff;border:1px solid #c3c4c7;border-left:4px solid #2271b1;padding:16px 20px;margin:15px 0;border-radius:4px;">
-				<h2 style="margin:0 0 12px;"><?php esc_html_e( 'Cyberpanel Account Dashboard', 'email-api-mailer-for-cyberpanel' ); ?></h2>
+				<h2 style="margin:0 0 12px;"><?php esc_html_e( 'Account Dashboard', 'rest-email-api-mailer' ); ?></h2>
 				<div style="display:flex;flex-wrap:wrap;gap:20px;">
 					<div style="flex:1;min-width:220px;">
-						<h3 style="margin:0 0 8px;font-size:14px;color:#1d2327;"><?php esc_html_e( 'Account', 'email-api-mailer-for-cyberpanel' ); ?></h3>
+						<h3 style="margin:0 0 8px;font-size:14px;color:#1d2327;"><?php esc_html_e( 'Account', 'rest-email-api-mailer' ); ?></h3>
 						<table style="width:100%;border-collapse:collapse;">
 							<tr>
-								<td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Plan', 'email-api-mailer-for-cyberpanel' ); ?></td>
+								<td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Plan', 'rest-email-api-mailer' ); ?></td>
 								<td style="padding:4px 8px;">
 									<strong><?php echo esc_html( ucfirst( $plan ) ); ?></strong>
 									<?php if ( '' !== $status_acc ) : ?>
@@ -522,25 +522,25 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 									<?php endif; ?>
 								</td>
 							</tr>
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Reputation', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( (string) $reputation ); ?></strong>/100</td></tr>
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Verified domains', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( (string) $domains ); ?></strong></td></tr>
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Rate limit', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><span style="font-size:12px;"><?php echo esc_html( (string) $rate_min ); ?>/min &bull; <?php echo esc_html( (string) $rate_hour ); ?>/h &bull; <?php echo esc_html( (string) $rate_day ); ?>/<?php esc_html_e( 'day', 'email-api-mailer-for-cyberpanel' ); ?></span></td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Reputation', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( (string) $reputation ); ?></strong>/100</td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Verified domains', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( (string) $domains ); ?></strong></td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Rate limit', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><span style="font-size:12px;"><?php echo esc_html( (string) $rate_min ); ?>/min &bull; <?php echo esc_html( (string) $rate_hour ); ?>/h &bull; <?php echo esc_html( (string) $rate_day ); ?>/<?php esc_html_e( 'day', 'rest-email-api-mailer' ); ?></span></td></tr>
 						</table>
 					</div>
 					<div style="flex:1;min-width:220px;">
-						<h3 style="margin:0 0 8px;font-size:14px;color:#1d2327;"><?php esc_html_e( 'Monthly Usage', 'email-api-mailer-for-cyberpanel' ); ?></h3>
+						<h3 style="margin:0 0 8px;font-size:14px;color:#1d2327;"><?php esc_html_e( 'Monthly Usage', 'rest-email-api-mailer' ); ?></h3>
 						<table style="width:100%;border-collapse:collapse;">
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Sent', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( number_format_i18n( $sent ) ); ?></strong> / <?php echo esc_html( number_format_i18n( $limit ) ); ?></td></tr>
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Remaining', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( number_format_i18n( $remaining ) ); ?></strong></td></tr>
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Delivered', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><strong style="color:#00a32a;"><?php echo esc_html( (string) $delivered ); ?></strong></td></tr>
-							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Bounces', 'email-api-mailer-for-cyberpanel' ); ?></td><td style="padding:4px 8px;"><strong style="color:<?php echo ( is_numeric( $bounced ) && (int) $bounced > 0 ) ? '#d63638' : '#00a32a'; ?>;"><?php echo esc_html( (string) $bounced ); ?></strong></td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Sent', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( number_format_i18n( $sent ) ); ?></strong> / <?php echo esc_html( number_format_i18n( $limit ) ); ?></td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Remaining', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><strong><?php echo esc_html( number_format_i18n( $remaining ) ); ?></strong></td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Delivered', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><strong style="color:#00a32a;"><?php echo esc_html( (string) $delivered ); ?></strong></td></tr>
+							<tr><td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Bounces', 'rest-email-api-mailer' ); ?></td><td style="padding:4px 8px;"><strong style="color:<?php echo ( is_numeric( $bounced ) && (int) $bounced > 0 ) ? '#d63638' : '#00a32a'; ?>;"><?php echo esc_html( (string) $bounced ); ?></strong></td></tr>
 						</table>
 					</div>
 					<div style="flex:1;min-width:220px;">
-						<h3 style="margin:0 0 8px;font-size:14px;color:#1d2327;"><?php esc_html_e( 'Engagement', 'email-api-mailer-for-cyberpanel' ); ?></h3>
+						<h3 style="margin:0 0 8px;font-size:14px;color:#1d2327;"><?php esc_html_e( 'Engagement', 'rest-email-api-mailer' ); ?></h3>
 						<table style="width:100%;border-collapse:collapse;">
 							<tr>
-								<td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Opened', 'email-api-mailer-for-cyberpanel' ); ?></td>
+								<td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Opened', 'rest-email-api-mailer' ); ?></td>
 								<td style="padding:4px 8px;">
 									<strong style="color:#2271b1;"><?php echo esc_html( (string) $opened ); ?></strong>
 									<?php if ( is_numeric( $opened ) && is_numeric( $delivered ) && (int) $delivered > 0 ) : ?>
@@ -549,7 +549,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 								</td>
 							</tr>
 							<tr>
-								<td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Clicked', 'email-api-mailer-for-cyberpanel' ); ?></td>
+								<td style="padding:4px 8px;color:#646970;"><?php esc_html_e( 'Clicked', 'rest-email-api-mailer' ); ?></td>
 								<td style="padding:4px 8px;">
 									<strong style="color:#2271b1;"><?php echo esc_html( (string) $clicked ); ?></strong>
 									<?php if ( is_numeric( $clicked ) && is_numeric( $delivered ) && (int) $delivered > 0 ) : ?>
@@ -569,7 +569,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 						<?php
 						printf(
 							/* translators: 1: percentage used, 2: last update date/time */
-							esc_html__( '%1$s%% of monthly quota used | Updated on %2$s', 'email-api-mailer-for-cyberpanel' ),
+							esc_html__( '%1$s%% of monthly quota used | Updated on %2$s', 'rest-email-api-mailer' ),
 							esc_html( (string) $pct_used ),
 							esc_html( $fetched_str )
 						);
@@ -585,7 +585,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 		 */
 		public function handle_test_email() {
 			if ( ! current_user_can( self::CAP ) ) {
-				wp_die( esc_html__( 'You do not have permission to perform this action.', 'email-api-mailer-for-cyberpanel' ) );
+				wp_die( esc_html__( 'You do not have permission to perform this action.', 'rest-email-api-mailer' ) );
 			}
 			check_admin_referer( 'cyberpanel_email_test' );
 
@@ -596,29 +596,29 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 			if ( '' === $to || ! is_email( $to ) ) {
 				$this->redirect_with_notice(
 					'error',
-					__( 'Invalid recipient address.', 'email-api-mailer-for-cyberpanel' )
+					__( 'Invalid recipient address.', 'rest-email-api-mailer' )
 				);
 			}
 
 			$site_name = get_bloginfo( 'name' );
 			/* translators: 1: site name, 2: current date/time */
-			$subject = sprintf( __( '[%1$s] Cyberpanel API Email test - %2$s', 'email-api-mailer-for-cyberpanel' ), $site_name, current_time( 'd/m/Y H:i:s' ) );
+			$subject = sprintf( __( '[%1$s] Email API test - %2$s', 'rest-email-api-mailer' ), $site_name, current_time( 'd/m/Y H:i:s' ) );
 
 			$body  = '<html><body>';
-			$body .= '<h1>' . esc_html__( 'Email Test', 'email-api-mailer-for-cyberpanel' ) . '</h1>';
-			$body .= '<p>' . esc_html__( 'This email was sent through the Cyberpanel API.', 'email-api-mailer-for-cyberpanel' ) . '</p>';
-			$body .= '<p>' . esc_html__( 'Site:', 'email-api-mailer-for-cyberpanel' ) . ' ' . esc_html( $site_name ) . '</p>';
-			$body .= '<p>' . esc_html__( 'Date/time:', 'email-api-mailer-for-cyberpanel' ) . ' ' . esc_html( current_time( 'd/m/Y H:i:s' ) ) . '</p>';
+			$body .= '<h1>' . esc_html__( 'Email Test', 'rest-email-api-mailer' ) . '</h1>';
+			$body .= '<p>' . esc_html__( 'This email was sent through the Cyberpanel API.', 'rest-email-api-mailer' ) . '</p>';
+			$body .= '<p>' . esc_html__( 'Site:', 'rest-email-api-mailer' ) . ' ' . esc_html( $site_name ) . '</p>';
+			$body .= '<p>' . esc_html__( 'Date/time:', 'rest-email-api-mailer' ) . ' ' . esc_html( current_time( 'd/m/Y H:i:s' ) ) . '</p>';
 			$body .= '</body></html>';
 
 			$result = wp_mail( $to, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 
 			if ( $result ) {
 				/* translators: %s: recipient email */
-				$msg = sprintf( __( 'Test email successfully sent to %s.', 'email-api-mailer-for-cyberpanel' ), $to );
+				$msg = sprintf( __( 'Test email successfully sent to %s.', 'rest-email-api-mailer' ), $to );
 				$this->redirect_with_notice( 'success', $msg );
 			} else {
-				$this->redirect_with_notice( 'error', __( 'Failed to send test email.', 'email-api-mailer-for-cyberpanel' ) );
+				$this->redirect_with_notice( 'error', __( 'Failed to send test email.', 'rest-email-api-mailer' ) );
 			}
 		}
 
@@ -627,11 +627,11 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 		 */
 		public function handle_check_now() {
 			if ( ! current_user_can( self::CAP ) ) {
-				wp_die( esc_html__( 'You do not have permission to perform this action.', 'email-api-mailer-for-cyberpanel' ) );
+				wp_die( esc_html__( 'You do not have permission to perform this action.', 'rest-email-api-mailer' ) );
 			}
 			check_admin_referer( 'cyberpanel_email_check_now' );
 			$this->check_delivery_status();
-			$this->redirect_with_notice( 'success', __( 'Delivery check executed.', 'email-api-mailer-for-cyberpanel' ) );
+			$this->redirect_with_notice( 'success', __( 'Delivery check executed.', 'rest-email-api-mailer' ) );
 		}
 
 		/**
@@ -1152,7 +1152,7 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 			$lines = array_slice( $lines, -30 );
 			$lines = array_reverse( $lines );
 
-			echo '<hr><h2>' . esc_html__( 'Send & Delivery Log (last 30)', 'email-api-mailer-for-cyberpanel' ) . '</h2>';
+			echo '<hr><h2>' . esc_html__( 'Send & Delivery Log (last 30)', 'rest-email-api-mailer' ) . '</h2>';
 			echo '<div style="background:#1d2327;color:#c3c4c7;padding:15px;border-radius:4px;font-family:monospace;font-size:13px;max-height:500px;overflow-y:auto;">';
 			foreach ( $lines as $line ) {
 				$color = '#c3c4c7';
@@ -1179,8 +1179,8 @@ if ( ! class_exists( 'Cyberpanel_Email_API' ) ) {
 }
 
 // Bootstrap.
-Cyberpanel_Email_API::get_instance();
+REST_Email_API_Mailer::get_instance();
 
 // Activation and deactivation hooks.
-register_activation_hook( __FILE__, array( 'Cyberpanel_Email_API', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'Cyberpanel_Email_API', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'REST_Email_API_Mailer', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'REST_Email_API_Mailer', 'deactivate' ) );

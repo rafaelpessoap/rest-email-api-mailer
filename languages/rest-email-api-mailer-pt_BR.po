@@ -1,12 +1,12 @@
-# Brazilian Portuguese translation for Email API Mailer for Cyberpanel.
+# Brazilian Portuguese translation for REST Email API Mailer.
 # Copyright (C) 2026 Rafael Pessoa
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Email API Mailer for Cyberpanel 2.0.0\n"
-"Report-Msgid-Bugs-To: https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/issues\n"
-"POT-Creation-Date: 2026-04-22 12:00+0000\n"
-"PO-Revision-Date: 2026-04-22 12:00+0000\n"
+"Project-Id-Version: REST Email API Mailer 2.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/rafaelpessoap/rest-email-api-mailer/issues\n"
+"POT-Creation-Date: 2026-05-07 12:00+0000\n"
+"PO-Revision-Date: 2026-05-07 12:00+0000\n"
 "Last-Translator: Rafael Pessoa\n"
 "Language-Team: Brazilian Portuguese\n"
 "Language: pt_BR\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Domain: email-api-mailer-for-cyberpanel\n"
+"X-Domain: rest-email-api-mailer\n"
 
 msgid "Email API Mailer"
 msgstr "Email API Mailer"
@@ -25,8 +25,8 @@ msgstr "A chave da API contém caracteres inválidos."
 msgid "You do not have permission to access this page."
 msgstr "Você não tem permissão para acessar esta página."
 
-msgid "Email API Mailer for Cyberpanel"
-msgstr "Email API Mailer para Cyberpanel"
+msgid "REST Email API Mailer"
+msgstr "REST Email API Mailer"
 
 msgid "Enable"
 msgstr "Ativar"
@@ -88,8 +88,8 @@ msgstr "Verificar agora"
 msgid "Account statistics are not yet available. They will be fetched during the next delivery check."
 msgstr "Estatísticas da conta ainda não disponíveis. Serão carregadas na próxima verificação de entrega."
 
-msgid "Cyberpanel Account Dashboard"
-msgstr "Painel da conta Cyberpanel"
+msgid "Account Dashboard"
+msgstr "Painel da conta"
 
 msgid "Account"
 msgstr "Conta"
@@ -146,8 +146,8 @@ msgstr "Endereço de destinatário inválido."
 
 #. translators: 1: site name, 2: current date/time
 #, php-format
-msgid "[%1$s] Cyberpanel API Email test - %2$s"
-msgstr "[%1$s] Teste Cyberpanel API Email - %2$s"
+msgid "[%1$s] Email API test - %2$s"
+msgstr "[%1$s] Teste Email API - %2$s"
 
 msgid "Email Test"
 msgstr "Teste de email"

@@ -15,7 +15,7 @@ Only the latest minor release receives security fixes. Please upgrade before rep
 
 Instead, please report vulnerabilities privately using one of the following channels:
 
-- GitHub's [private vulnerability reporting](https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/security/advisories/new) (preferred)
+- GitHub's [private vulnerability reporting](https://github.com/rafaelpessoap/rest-email-api-mailer/security/advisories/new) (preferred)
 - Or open a minimal public issue asking for a secure contact channel; avoid including proof-of-concept details
 
 Please include:

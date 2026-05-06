@@ -1,12 +1,17 @@
 <?php
 /**
- * Uninstall cleanup for Email API Mailer for Cyberpanel.
+ * Uninstall cleanup for REST Email API Mailer.
  *
  * Runs when the user explicitly deletes the plugin from the Plugins screen.
  * Removes every persisted option, clears cron events and deletes the protected
  * log directory created under uploads.
  *
- * @package Email_API_Mailer_For_Cyberpanel
+ * Internal option keys, cron hook names and the wp-config constant are kept
+ * with their historical `cyberpanel_email_*` / `CYBERPANEL_EMAIL_*` prefix
+ * so existing installs that upgraded from earlier versions are uninstalled
+ * cleanly without requiring an extra migration step.
+ *
+ * @package REST_Email_API_Mailer
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {

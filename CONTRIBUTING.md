@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in improving **Email API Mailer for Cyberpanel**. Contributions of every size are welcome.
+Thanks for your interest in improving **REST Email API Mailer**. Contributions of every size are welcome.
 
 ## Ground rules
 
@@ -13,8 +13,8 @@ Thanks for your interest in improving **Email API Mailer for Cyberpanel**. Contr
 This plugin is intentionally single-file. You do not need Composer or npm to work on it.
 
 ```bash
-git clone https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel.git
-cd email-api-mailer-for-cyberpanel
+git clone https://github.com/rafaelpessoap/rest-email-api-mailer.git
+cd rest-email-api-mailer
 ```
 
 For local testing, symlink or copy the folder into a WordPress instance's `wp-content/plugins/` directory and activate it from the admin panel.
@@ -23,7 +23,8 @@ For local testing, symlink or copy the folder into a WordPress instance's `wp-co
 
 - Target **PHP 7.4+** and **WordPress 6.1+**.
 - Follow the [WordPress PHP Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/). A `phpcs.xml.dist` is included for automated checks.
-- Every user-facing string must be translatable via `__()`, `esc_html__()`, `esc_attr__()` or `_e()` with the text domain `email-api-mailer-for-cyberpanel`.
+- Every user-facing string must be translatable via `__()`, `esc_html__()`, `esc_attr__()` or `_e()` with the text domain `rest-email-api-mailer`.
+- Functional descriptions may reference the third-party service the plugin connects to (Cyberpanel / cyberpersons.com), but the plugin's own identity (display name, slug, branding) must stay neutral. We are not affiliated with the service.
 - Every output must be escaped at the point of output (`esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()` as appropriate).
 - Every `$_GET` / `$_POST` / `$_REQUEST` access must pass through `wp_unslash()` and a sanitization function.
 - Every admin action must be guarded by `current_user_can()` and a nonce.
@@ -32,16 +33,16 @@ For local testing, symlink or copy the folder into a WordPress instance's `wp-co
 
 ```bash
 composer global require "squizlabs/php_codesniffer=*" "wp-coding-standards/wpcs=*"
-phpcs --standard=phpcs.xml.dist email-api-mailer-for-cyberpanel.php uninstall.php
+phpcs --standard=phpcs.xml.dist rest-email-api-mailer.php uninstall.php
 ```
 
 The same checks run automatically on every pull request via GitHub Actions.
 
 ## Translations
 
-- Source strings live in `email-api-mailer-for-cyberpanel.php` (English).
-- The translation template is `languages/email-api-mailer-for-cyberpanel.pot`.
-- Per-locale files go in `languages/email-api-mailer-for-cyberpanel-{locale}.po` with the matching compiled `.mo`.
+- Source strings live in `rest-email-api-mailer.php` (English).
+- The translation template is `languages/rest-email-api-mailer.pot`.
+- Per-locale files go in `languages/rest-email-api-mailer-{locale}.po` with the matching compiled `.mo`.
 
 If you are adding a new locale, please submit the `.po` file; maintainers will compile the `.mo` during the release process.
 

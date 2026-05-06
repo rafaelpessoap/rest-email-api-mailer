@@ -4,6 +4,24 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-07
+
+### Changed
+
+- **Renamed plugin to "REST Email API Mailer"** (slug `rest-email-api-mailer`, GitHub repo `rest-email-api-mailer`) to comply with the WordPress.org Plugin Directory ownership guideline. The previous identity ("Email API Mailer for Cyberpanel") incorporated the trademark of a third-party service the plugin connects to but does not represent; the WP.org Plugin Review Team requires plugin identity to either come from the trademark holder's own WordPress.org account or to drop the trademark from name and slug. We chose the second path.
+- Display name, slug, text domain, plugin file name (`rest-email-api-mailer.php`), translation file names (`rest-email-api-mailer.pot`, `rest-email-api-mailer-pt_BR.po/.mo`), main class name (`REST_Email_API_Mailer`) and `@package` annotation all updated to the new neutral identity.
+- Plugin URI, GitHub repository URL and translation header URLs updated to `https://github.com/rafaelpessoap/rest-email-api-mailer`. The previous URL still redirects automatically thanks to GitHub's automatic redirect on rename.
+- Plugin Description in the file header now states explicitly that the plugin is independent and not affiliated with Cyberpanel or CyberPersons LLC.
+- A few admin-visible labels were rebranded to neutral wording: the settings page `<h1>` no longer carries the third-party brand, and the Account Dashboard heading was generalized.
+
+### Kept (intentional, for backward compatibility)
+
+- Internal database option key prefix (`cyberpanel_email_*`) and migrated-from-legacy marker — three production sites already store data under these keys and no migration was needed.
+- Cron hook name `cyberpanel_email_check_delivery` — pre-existing scheduled events on production sites continue to run uninterrupted.
+- `CYBERPANEL_EMAIL_API_KEY` constant in `wp-config.php` — site owners who set this on existing installs keep their configuration without intervention.
+- Log directory path (`wp-content/uploads/cyberpanel-email/`) — same rationale.
+- Functional descriptions in admin UI still reference the third-party API the plugin sends to (e.g. "Send emails through the Cyberpanel API"), since they describe what the plugin does, not who owns it.
+
 ## [2.0.5] - 2026-04-30
 
 ### Changed

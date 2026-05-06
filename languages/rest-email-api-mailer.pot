@@ -2,9 +2,9 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Email API Mailer for Cyberpanel 2.0.0\n"
-"Report-Msgid-Bugs-To: https://github.com/rafaelpessoap/email-api-mailer-for-cyberpanel/issues\n"
-"POT-Creation-Date: 2026-04-22 12:00+0000\n"
+"Project-Id-Version: REST Email API Mailer 2.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/rafaelpessoap/rest-email-api-mailer/issues\n"
+"POT-Creation-Date: 2026-05-07 12:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Domain: email-api-mailer-for-cyberpanel\n"
+"X-Domain: rest-email-api-mailer\n"
 
 msgid "Email API Mailer"
 msgstr ""
@@ -23,7 +23,7 @@ msgstr ""
 msgid "You do not have permission to access this page."
 msgstr ""
 
-msgid "Email API Mailer for Cyberpanel"
+msgid "REST Email API Mailer"
 msgstr ""
 
 msgid "Enable"
@@ -86,7 +86,7 @@ msgstr ""
 msgid "Account statistics are not yet available. They will be fetched during the next delivery check."
 msgstr ""
 
-msgid "Cyberpanel Account Dashboard"
+msgid "Account Dashboard"
 msgstr ""
 
 msgid "Account"
@@ -144,7 +144,7 @@ msgstr ""
 
 #. translators: 1: site name, 2: current date/time
 #, php-format
-msgid "[%1$s] Cyberpanel API Email test - %2$s"
+msgid "[%1$s] Email API test - %2$s"
 msgstr ""
 
 msgid "Email Test"

@@ -23,18 +23,18 @@ jobs:
         run: |
           # Scan exactly what ships to users, not the repo-only files such
           # as .wordpress-org assets, CI config and development docs.
-          mkdir -p /tmp/plugin-dist/email-api-mailer-for-cyberpanel
+          mkdir -p /tmp/plugin-dist/rest-email-api-mailer
           rsync -a \
             --exclude='.git/' \
             --exclude-from='.distignore' \
-            ./ /tmp/plugin-dist/email-api-mailer-for-cyberpanel/
+            ./ /tmp/plugin-dist/rest-email-api-mailer/
           echo "=== Distribution contents ==="
-          find /tmp/plugin-dist/email-api-mailer-for-cyberpanel -maxdepth 2 | sort
+          find /tmp/plugin-dist/rest-email-api-mailer -maxdepth 2 | sort
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@6f5a57e173c065a394b78688f75df543e4011902 # v1.1.5
         with:
-          build-dir: /tmp/plugin-dist/email-api-mailer-for-cyberpanel
+          build-dir: /tmp/plugin-dist/rest-email-api-mailer
           # Warnings are reported but do not fail the build; errors still fail.
           # Uncomment to make warnings blocking:
           # fail-on-warnings: true
