@@ -51,17 +51,17 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<!-- Public identity prefix for the v2.1.0+ neutral rename. -->
-				<element value="REST_Email_API_Mailer"/>
 				<!--
-					Internal cyberpanel_email_* names are intentionally retained
-					from the prior identity for backward compatibility with
-					existing installs. They are not user visible.
+					Unique plugin-wide prefix (v2.2.0+). All function, class,
+					constant, option and hook identifiers defined by this plugin
+					start with one of these. Legacy prefixes from previous
+					identities are not whitelisted because the plugin no longer
+					defines new globals under them — the migration code only
+					reads and deletes the old keys.
 				-->
-				<element value="cyberpanel_email"/>
-				<element value="Cyberpanel_Email"/>
-				<element value="CYBERPANEL_EMAIL"/>
-				<element value="_cyberpanel_email"/>
+				<element value="restemap"/>
+				<element value="Restemap"/>
+				<element value="RESTEMAP"/>
 			</property>
 		</properties>
 	</rule>

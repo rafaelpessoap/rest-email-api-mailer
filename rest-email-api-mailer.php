@@ -3,7 +3,7 @@
  * Plugin Name:       REST Email API Mailer
  * Plugin URI:        https://github.com/rafaelpessoap/rest-email-api-mailer
  * Description:       Replaces the default wp_mail() with delivery via the transactional email REST API hosted at platform.cyberpersons.com (the email service used by Cyberpanel hosting). Includes smart delivery tracking, account statistics dashboard, and graceful fallback to the standard PHP mailer when disabled. Independent open-source plugin — not affiliated with, endorsed by or sponsored by Cyberpanel or CyberPersons LLC.
- * Version:           2.1.0
+ * Version:           2.2.0
  * Author:            Rafael Pessoa
  * Author URI:        https://arsenalcraft.com.br
  * License:           GPL v2 or later
@@ -14,14 +14,14 @@
  * Tested up to:      6.9
  * Requires PHP:      7.4
  *
- * @package REST_Email_API_Mailer
+ * @package Restemap_Plugin
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
+if ( ! class_exists( 'Restemap_Plugin' ) ) {
 
 	/**
 	 * Main plugin class.
@@ -29,34 +29,34 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 	 * Singleton that wires up admin UI, settings, email sending, delivery
 	 * tracking cron and logging.
 	 */
-	final class REST_Email_API_Mailer {
+	final class Restemap_Plugin {
 
-		const VERSION      = '2.1.0';
+		const VERSION      = '2.2.0';
 		const TEXT_DOMAIN  = 'rest-email-api-mailer';
 		const API_BASE     = 'https://platform.cyberpersons.com/email/v1';
-		const SLUG         = 'cyberpanel-api-email';
+		const SLUG         = 'restemap';
 		const CAP          = 'manage_options';
-		const CRON_HOOK    = 'cyberpanel_email_check_delivery';
+		const CRON_HOOK    = 'restemap_check_delivery';
 
-		const OPT_API_KEY    = 'cyberpanel_email_api_key';
-		const OPT_FROM_EMAIL = 'cyberpanel_email_from_email';
-		const OPT_FROM_NAME  = 'cyberpanel_email_from_name';
-		const OPT_ENABLED    = 'cyberpanel_email_enabled';
-		const OPT_PENDING    = 'cyberpanel_email_pending_messages';
-		const OPT_STATS      = 'cyberpanel_email_account_stats';
-		const OPT_MIGRATED   = 'cyberpanel_email_migrated_from_legacy';
+		const OPT_API_KEY    = 'restemap_api_key';
+		const OPT_FROM_EMAIL = 'restemap_from_email';
+		const OPT_FROM_NAME  = 'restemap_from_name';
+		const OPT_ENABLED    = 'restemap_enabled';
+		const OPT_PENDING    = 'restemap_pending_messages';
+		const OPT_STATS      = 'restemap_account_stats';
+		const OPT_MIGRATED   = 'restemap_migrated_from_legacy';
 
 		/**
 		 * Singleton instance.
 		 *
-		 * @var REST_Email_API_Mailer|null
+		 * @var Restemap_Plugin|null
 		 */
 		private static $instance = null;
 
 		/**
 		 * Get the singleton instance.
 		 *
-		 * @return REST_Email_API_Mailer
+		 * @return Restemap_Plugin
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {
@@ -78,8 +78,8 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 			add_action( 'admin_init', array( $this, 'maybe_migrate_legacy_options' ) );
 			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 			add_action( 'admin_init', array( $this, 'register_settings' ) );
-			add_action( 'admin_post_cyberpanel_email_test', array( $this, 'handle_test_email' ) );
-			add_action( 'admin_post_cyberpanel_email_check_now', array( $this, 'handle_check_now' ) );
+			add_action( 'admin_post_restemap_test', array( $this, 'handle_test_email' ) );
+			add_action( 'admin_post_restemap_check_now', array( $this, 'handle_check_now' ) );
 			add_action( self::CRON_HOOK, array( $this, 'check_delivery_status' ) );
 			add_filter( 'pre_wp_mail', array( __CLASS__, 'filter_pre_wp_mail' ), 10, 2 );
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( __CLASS__, 'add_settings_action_link' ) );
@@ -127,32 +127,58 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 		}
 
 		/**
-		 * One-time migration from the legacy "cyberpersons_*" option names
-		 * used prior to v2.0.0. Runs silently in admin_init.
+		 * One-time migration from previous option prefixes.
+		 *
+		 * Two generations of legacy keys may exist on a given install:
+		 *   - `cyberpanel_email_*` (v2.0.0 – v2.1.0)
+		 *   - `cyberpersons_*`     (pre-2.0.0, internal only)
+		 *
+		 * Both sets are copied into the current `restemap_*` keys (preferring
+		 * the newer set when both exist) and then deleted. The previously
+		 * scheduled cron event under the old hook name is unscheduled and a
+		 * new one rescheduled under the current hook so delivery tracking
+		 * keeps running uninterrupted. Runs silently in admin_init.
 		 */
 		public function maybe_migrate_legacy_options() {
 			if ( get_option( self::OPT_MIGRATED ) ) {
 				return;
 			}
 
-			$legacy_map = array(
-				'cyberpersons_api_key'           => self::OPT_API_KEY,
-				'cyberpersons_from_email'        => self::OPT_FROM_EMAIL,
-				'cyberpersons_from_name'         => self::OPT_FROM_NAME,
-				'cyberpersons_enabled'           => self::OPT_ENABLED,
-				'cyberpersons_pending_messages'  => self::OPT_PENDING,
-				'cyberpersons_account_stats'    => self::OPT_STATS,
+			$keys = array(
+				'api_key'           => self::OPT_API_KEY,
+				'from_email'        => self::OPT_FROM_EMAIL,
+				'from_name'         => self::OPT_FROM_NAME,
+				'enabled'           => self::OPT_ENABLED,
+				'pending_messages'  => self::OPT_PENDING,
+				'account_stats'     => self::OPT_STATS,
 			);
 
-			foreach ( $legacy_map as $old => $new ) {
-				$value = get_option( $old, null );
-				if ( null === $value ) {
-					continue;
+			foreach ( $keys as $suffix => $current ) {
+				$cyberpanel   = get_option( 'cyberpanel_email_' . $suffix, null );
+				$cyberpersons = get_option( 'cyberpersons_' . $suffix, null );
+				$value        = ( null !== $cyberpanel ) ? $cyberpanel : $cyberpersons;
+
+				if ( null !== $value && false === get_option( $current, false ) ) {
+					update_option( $current, $value, false );
 				}
-				if ( false === get_option( $new, false ) ) {
-					update_option( $new, $value, false );
+				delete_option( 'cyberpanel_email_' . $suffix );
+				delete_option( 'cyberpersons_' . $suffix );
+			}
+
+			// Drop the previous generation's own migration marker.
+			delete_option( 'cyberpanel_email_migrated_from_legacy' );
+
+			// Move any scheduled cron from previous hook names to the current one.
+			$legacy_hooks = array( 'cyberpanel_email_check_delivery', 'cyberpersons_check_delivery' );
+			foreach ( $legacy_hooks as $old_hook ) {
+				$next = wp_next_scheduled( $old_hook );
+				if ( $next ) {
+					wp_unschedule_event( $next, $old_hook );
+					if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
+						wp_schedule_single_event( max( $next, time() + 60 ), self::CRON_HOOK );
+					}
 				}
-				delete_option( $old );
+				wp_clear_scheduled_hook( $old_hook );
 			}
 
 			update_option( self::OPT_MIGRATED, self::VERSION, false );
@@ -165,8 +191,8 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 		 * @return string
 		 */
 		public static function get_api_key() {
-			if ( defined( 'CYBERPANEL_EMAIL_API_KEY' ) && '' !== CYBERPANEL_EMAIL_API_KEY ) {
-				return (string) CYBERPANEL_EMAIL_API_KEY;
+			if ( defined( 'RESTEMAP_API_KEY' ) && '' !== RESTEMAP_API_KEY ) {
+				return (string) RESTEMAP_API_KEY;
 			}
 			return (string) get_option( self::OPT_API_KEY, '' );
 		}
@@ -193,7 +219,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 			if ( empty( $uploads['basedir'] ) ) {
 				return '';
 			}
-			return trailingslashit( $uploads['basedir'] ) . 'cyberpanel-email/cyberpanel-email.log.php';
+			return trailingslashit( $uploads['basedir'] ) . 'restemap/restemap.log.php';
 		}
 
 		/**
@@ -268,7 +294,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 		 */
 		public function register_settings() {
 			register_setting(
-				'cyberpanel_email',
+				'restemap',
 				self::OPT_API_KEY,
 				array(
 					'type'              => 'string',
@@ -277,7 +303,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 				)
 			);
 			register_setting(
-				'cyberpanel_email',
+				'restemap',
 				self::OPT_FROM_EMAIL,
 				array(
 					'type'              => 'string',
@@ -286,7 +312,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 				)
 			);
 			register_setting(
-				'cyberpanel_email',
+				'restemap',
 				self::OPT_FROM_NAME,
 				array(
 					'type'              => 'string',
@@ -295,7 +321,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 				)
 			);
 			register_setting(
-				'cyberpanel_email',
+				'restemap',
 				self::OPT_ENABLED,
 				array(
 					'type'              => 'boolean',
@@ -349,7 +375,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'rest-email-api-mailer' ) );
 			}
 
-			$api_key_from_constant = defined( 'CYBERPANEL_EMAIL_API_KEY' ) && '' !== CYBERPANEL_EMAIL_API_KEY;
+			$api_key_from_constant = defined( 'RESTEMAP_API_KEY' ) && '' !== RESTEMAP_API_KEY;
 			$api_key               = $api_key_from_constant ? '' : (string) get_option( self::OPT_API_KEY, '' );
 			$from_email            = (string) get_option( self::OPT_FROM_EMAIL, '' );
 			$from_name             = (string) get_option( self::OPT_FROM_NAME, '' );
@@ -385,7 +411,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 				<?php $this->render_stats_panel( $stats ); ?>
 
 				<form method="post" action="options.php">
-					<?php settings_fields( 'cyberpanel_email' ); ?>
+					<?php settings_fields( 'restemap' ); ?>
 					<table class="form-table" role="presentation">
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Enable', 'rest-email-api-mailer' ); ?></th>
@@ -401,10 +427,10 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 							<th scope="row"><?php esc_html_e( 'API Key', 'rest-email-api-mailer' ); ?></th>
 							<td>
 								<?php if ( $api_key_from_constant ) : ?>
-									<p><code><?php esc_html_e( 'Defined via CYBERPANEL_EMAIL_API_KEY in wp-config.php', 'rest-email-api-mailer' ); ?></code></p>
+									<p><code><?php esc_html_e( 'Defined via RESTEMAP_API_KEY in wp-config.php', 'rest-email-api-mailer' ); ?></code></p>
 								<?php else : ?>
 									<input type="password" name="<?php echo esc_attr( self::OPT_API_KEY ); ?>" value="<?php echo esc_attr( $api_key ); ?>" class="regular-text" autocomplete="new-password">
-									<p class="description"><?php esc_html_e( 'API key created in your Cyberpanel account. For extra security, define CYBERPANEL_EMAIL_API_KEY in wp-config.php instead of storing it in the database.', 'rest-email-api-mailer' ); ?></p>
+									<p class="description"><?php esc_html_e( 'API key created in your Cyberpanel account. For extra security, define RESTEMAP_API_KEY in wp-config.php instead of storing it in the database.', 'rest-email-api-mailer' ); ?></p>
 								<?php endif; ?>
 							</td>
 						</tr>
@@ -429,8 +455,8 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 				<hr>
 				<h2><?php esc_html_e( 'Send Test Email', 'rest-email-api-mailer' ); ?></h2>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-					<input type="hidden" name="action" value="cyberpanel_email_test">
-					<?php wp_nonce_field( 'cyberpanel_email_test' ); ?>
+					<input type="hidden" name="action" value="restemap_test">
+					<?php wp_nonce_field( 'restemap_test' ); ?>
 					<table class="form-table" role="presentation">
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Recipient', 'rest-email-api-mailer' ); ?></th>
@@ -458,8 +484,8 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 					<?php echo (int) count( $pending ); ?>
 				</p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;">
-					<input type="hidden" name="action" value="cyberpanel_email_check_now">
-					<?php wp_nonce_field( 'cyberpanel_email_check_now' ); ?>
+					<input type="hidden" name="action" value="restemap_check_now">
+					<?php wp_nonce_field( 'restemap_check_now' ); ?>
 					<?php submit_button( __( 'Check Now', 'rest-email-api-mailer' ), 'secondary', 'submit', false ); ?>
 				</form>
 
@@ -587,7 +613,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 			if ( ! current_user_can( self::CAP ) ) {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'rest-email-api-mailer' ) );
 			}
-			check_admin_referer( 'cyberpanel_email_test' );
+			check_admin_referer( 'restemap_test' );
 
 			$to = isset( $_POST['test_to'] )
 				? sanitize_email( wp_unslash( $_POST['test_to'] ) )
@@ -629,7 +655,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 			if ( ! current_user_can( self::CAP ) ) {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'rest-email-api-mailer' ) );
 			}
-			check_admin_referer( 'cyberpanel_email_check_now' );
+			check_admin_referer( 'restemap_check_now' );
 			$this->check_delivery_status();
 			$this->redirect_with_notice( 'success', __( 'Delivery check executed.', 'rest-email-api-mailer' ) );
 		}
@@ -665,7 +691,7 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 		 * @return string
 		 */
 		private static function admin_notice_key() {
-			return 'cp_email_notice_' . (int) get_current_user_id();
+			return 'restemap_notice_' . (int) get_current_user_id();
 		}
 
 		/**
@@ -1179,8 +1205,8 @@ if ( ! class_exists( 'REST_Email_API_Mailer' ) ) {
 }
 
 // Bootstrap.
-REST_Email_API_Mailer::get_instance();
+Restemap_Plugin::get_instance();
 
 // Activation and deactivation hooks.
-register_activation_hook( __FILE__, array( 'REST_Email_API_Mailer', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'REST_Email_API_Mailer', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'Restemap_Plugin', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Restemap_Plugin', 'deactivate' ) );

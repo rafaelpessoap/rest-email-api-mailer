@@ -4,7 +4,7 @@ Tags: email, smtp, transactional email, wp_mail, rest api
 Requires at least: 6.1
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,8 +29,8 @@ I built this plugin after looking for a simple way to connect WordPress to the e
 * **Built-in test email** — one-click test from the settings screen to confirm the integration is working.
 * **Safe fallback** — when the plugin toggle is off, WordPress keeps using its default mailer (PHPMailer) without any side effects.
 * **Multiple recipients** — emails with several To/Cc/Bcc addresses are transparently split into one API call per recipient (current API limitation).
-* **wp-config.php constant support** — define `CYBERPANEL_EMAIL_API_KEY` in your `wp-config.php` to keep the API key out of the database.
-* **Protected log location** — logs are stored under `wp-content/uploads/cyberpanel-email/` in a `.log.php` file that begins with a PHP-exit guard, so even if the web server is configured to serve static files directly (Nginx, LiteSpeed, etc.) any direct HTTP request returns empty output. Additional `.htaccess`, `web.config` and `index.php` guards are created for defense in depth.
+* **wp-config.php constant support** — define `RESTEMAP_API_KEY` in your `wp-config.php` to keep the API key out of the database.
+* **Protected log location** — logs are stored under `wp-content/uploads/restemap/` in a `.log.php` file that begins with a PHP-exit guard, so even if the web server is configured to serve static files directly (Nginx, LiteSpeed, etc.) any direct HTTP request returns empty output. Additional `.htaccess`, `web.config` and `index.php` guards are created for defense in depth.
 
 = Data sent to third parties =
 
@@ -57,7 +57,7 @@ This plugin is an independent, open-source integration. It is **not affiliated w
 2. Activate the plugin from the **Plugins** screen.
 3. Go to **Settings > Email API Mailer**.
 4. Fill in:
-   * **API Key** — the `sk_live_...` key generated inside your Cyberpanel account (or define `CYBERPANEL_EMAIL_API_KEY` in `wp-config.php`).
+   * **API Key** — the `sk_live_...` key generated inside your Cyberpanel account (or define `RESTEMAP_API_KEY` in `wp-config.php`).
    * **Sender Email** — an address on a domain you already verified inside Cyberpanel.
    * **Sender Name** — the name your recipients will see.
 5. Enable the **Enable** toggle and save.
@@ -73,7 +73,7 @@ No long-running cron is required. When an email is sent the plugin records the r
 
 Yes. Add the following line to your `wp-config.php`:
 
-    define( 'CYBERPANEL_EMAIL_API_KEY', 'sk_live_your_key_here' );
+    define( 'RESTEMAP_API_KEY', 'sk_live_your_key_here' );
 
 The plugin detects the constant and prefers it over the value stored in the database.
 
@@ -91,7 +91,7 @@ Yes. When disabled, the plugin uses an internal drop-in that mirrors the standar
 
 = Where are the logs stored? =
 
-Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file starts with a `<?php exit; ?>` guard so any direct HTTP request returns empty output regardless of the web server in use. Additional `.htaccess`, `web.config` and `index.php` files block direct access as a defense-in-depth measure.
+Under `wp-content/uploads/restemap/restemap.log.php`. The file starts with a `<?php exit; ?>` guard so any direct HTTP request returns empty output regardless of the web server in use. Additional `.htaccess`, `web.config` and `index.php` files block direct access as a defense-in-depth measure.
 
 == Screenshots ==
 
@@ -101,8 +101,15 @@ Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file s
 
 == Changelog ==
 
+= 2.2.0 =
+* **Unique `restemap_` prefix throughout** — every plugin-defined function, class, option key, cron hook, action handler, nonce and wp-config constant now uses the same `restemap_` / `Restemap_` / `RESTEMAP_` prefix. Previous internal identifiers under different prefixes have been retired, satisfying the WordPress.org guideline that all plugin globals share a single distinctive prefix.
+* **Automatic one-time migration** of existing installs: option values, the migration marker and any scheduled delivery-check cron event are copied over from the previous keys (`cyberpanel_email_*`) — and from the original internal release (`cyberpersons_*`) when present — so upgrading from v2.0.x or v2.1.0 keeps every saved setting and pending delivery check intact.
+* **`CYBERPANEL_EMAIL_API_KEY` wp-config constant renamed to `RESTEMAP_API_KEY`.** If you previously kept the API key in `wp-config.php`, edit that file once after upgrading and rename the constant; otherwise the plugin will fall back to the value stored in the database.
+* **Log directory moved from `wp-content/uploads/cyberpanel-email/` to `wp-content/uploads/restemap/`.** A new directory is created automatically; the previous one (if any) is left in place and can be deleted manually.
+* **Settings page URL changed.** Bookmarks pointing to `options-general.php?page=cyberpanel-api-email` should be updated to `options-general.php?page=restemap`.
+
 = 2.1.0 =
-* **Renamed plugin to "REST Email API Mailer" (slug `rest-email-api-mailer`)** to comply with the WordPress.org ownership guideline that bars third-party plugins from carrying a trademarked vendor name in their identity. Existing installs keep all their settings — internal option keys, cron events and the `CYBERPANEL_EMAIL_API_KEY` constant are preserved as-is, so the upgrade is transparent.
+* **Renamed plugin to "REST Email API Mailer" (slug `rest-email-api-mailer`)** to comply with the WordPress.org ownership guideline that bars third-party plugins from carrying a trademarked vendor name in their identity. Existing installs keep all their settings — internal option keys, cron events and the wp-config constant are preserved as-is, so the upgrade is transparent.
 * Plugin URI now points to the renamed GitHub repository at `https://github.com/rafaelpessoap/rest-email-api-mailer` (the previous URL still redirects automatically).
 * Updated all admin-visible labels and screenshots references to the new plugin name. Functional descriptions still mention the third-party email service the plugin integrates with, with a clear "not affiliated with" disclaimer.
 
@@ -134,7 +141,7 @@ Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file s
 * English source strings with bundled Brazilian Portuguese translation (pt_BR).
 * Security hardening: capability checks on every admin action, nonces, `wp_unslash()` on all superglobals, sanitize callbacks on every registered option, use of `wp_safe_redirect()` for post-action redirects, escaping on every output.
 * Logs moved from `wp-content/cyberpersons-mailer.log` to a protected directory under `wp-content/uploads/cyberpanel-email/` with `.htaccess`, `web.config` and `index.php` guards.
-* Added `CYBERPANEL_EMAIL_API_KEY` constant support so the API key can live in `wp-config.php` instead of the database.
+* Added wp-config.php constant support so the API key can live outside the database.
 * Added `uninstall.php` that performs a full cleanup (options, cron, logs).
 * One-time automatic migration from the legacy `cyberpersons_*` option names used in v1.x.
 
@@ -142,6 +149,9 @@ Under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php`. The file s
 * Internal release. First working integration with delivery tracking, account stats dashboard and activity log. Portuguese-only strings, options prefixed with `cyberpersons_`.
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+Plugin-wide prefix unification. Settings migrate automatically on the first admin page load. If you defined the API key in wp-config.php, rename `CYBERPANEL_EMAIL_API_KEY` to `RESTEMAP_API_KEY`.
 
 = 2.0.0 =
 Major security and i18n release. Your previous settings are migrated automatically on the first admin page load after upgrading.

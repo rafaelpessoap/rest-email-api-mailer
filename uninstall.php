@@ -6,12 +6,13 @@
  * Removes every persisted option, clears cron events and deletes the protected
  * log directory created under uploads.
  *
- * Internal option keys, cron hook names and the wp-config constant are kept
- * with their historical `cyberpanel_email_*` / `CYBERPANEL_EMAIL_*` prefix
- * so existing installs that upgraded from earlier versions are uninstalled
- * cleanly without requiring an extra migration step.
+ * Legacy option names and log directory paths from previous identities of this
+ * plugin (`cyberpanel_email_*` in v2.0.0 – v2.1.0 and `cyberpersons_*` prior to
+ * that) are also removed as a safety net for installs that uninstalled
+ * immediately after upgrading, before the one-time migration had a chance to
+ * run.
  *
- * @package REST_Email_API_Mailer
+ * @package Restemap_Plugin
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
@@ -23,8 +24,17 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  * (WordPress coding standards require plugin-scope variables in top-level
  * files to be prefixed; wrapping avoids the prefix noise here).
  */
-function cyberpanel_email_run_uninstall() {
+function restemap_run_uninstall() {
 	$options_to_delete = array(
+		// Current option keys (v2.2.0+).
+		'restemap_api_key',
+		'restemap_from_email',
+		'restemap_from_name',
+		'restemap_enabled',
+		'restemap_pending_messages',
+		'restemap_account_stats',
+		'restemap_migrated_from_legacy',
+		// Previous identity (v2.0.0 – v2.1.0).
 		'cyberpanel_email_api_key',
 		'cyberpanel_email_from_email',
 		'cyberpanel_email_from_name',
@@ -32,8 +42,7 @@ function cyberpanel_email_run_uninstall() {
 		'cyberpanel_email_pending_messages',
 		'cyberpanel_email_account_stats',
 		'cyberpanel_email_migrated_from_legacy',
-		// Legacy option names (pre-2.0.0). Kept here so users upgrading
-		// from 1.x and uninstalling immediately do not leave orphan rows behind.
+		// Original internal release (pre-2.0.0).
 		'cyberpersons_api_key',
 		'cyberpersons_from_email',
 		'cyberpersons_from_name',
@@ -47,7 +56,11 @@ function cyberpanel_email_run_uninstall() {
 		delete_site_option( $option_name );
 	}
 
-	$cron_hooks = array( 'cyberpanel_email_check_delivery', 'cyberpersons_check_delivery' );
+	$cron_hooks = array(
+		'restemap_check_delivery',
+		'cyberpanel_email_check_delivery',
+		'cyberpersons_check_delivery',
+	);
 	foreach ( $cron_hooks as $hook_name ) {
 		$next_event = wp_next_scheduled( $hook_name );
 		if ( $next_event ) {
@@ -56,26 +69,30 @@ function cyberpanel_email_run_uninstall() {
 		wp_clear_scheduled_hook( $hook_name );
 	}
 
-	// Clear per-user admin notice transients.
+	// Clear per-user admin notice transients (current + legacy key).
 	$users = get_users( array( 'fields' => 'ID' ) );
 	foreach ( $users as $user_id ) {
+		delete_transient( 'restemap_notice_' . (int) $user_id );
 		delete_transient( 'cp_email_notice_' . (int) $user_id );
 	}
 
+	if ( ! function_exists( 'WP_Filesystem' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+	}
+
 	$uploads = wp_upload_dir( null, false );
-	if ( ! empty( $uploads['basedir'] ) ) {
-		$log_dir = trailingslashit( $uploads['basedir'] ) . 'cyberpanel-email';
-		if ( is_dir( $log_dir ) ) {
-			// Delete the directory and its contents recursively via WP_Filesystem.
-			if ( ! function_exists( 'WP_Filesystem' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/file.php';
-			}
-			if ( WP_Filesystem() ) {
-				global $wp_filesystem;
+	if ( ! empty( $uploads['basedir'] ) && WP_Filesystem() ) {
+		global $wp_filesystem;
+		$log_dirs = array(
+			trailingslashit( $uploads['basedir'] ) . 'restemap',
+			trailingslashit( $uploads['basedir'] ) . 'cyberpanel-email',
+		);
+		foreach ( $log_dirs as $log_dir ) {
+			if ( is_dir( $log_dir ) ) {
 				$wp_filesystem->delete( $log_dir, true, 'd' );
 			}
 		}
 	}
 }
 
-cyberpanel_email_run_uninstall();
+restemap_run_uninstall();

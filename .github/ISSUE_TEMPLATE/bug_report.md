@@ -24,7 +24,7 @@ A clear and concise description of what you expected to happen.
 - Server stack (Apache / Nginx / LiteSpeed):
 
 **Logs**
-If possible, paste relevant lines from the plugin log file at `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php` (path kept from earlier versions to preserve backward compatibility — redact recipient addresses if needed).
+If possible, paste relevant lines from the plugin log file at `wp-content/uploads/restemap/restemap.log.php` (redact recipient addresses if needed).
 
 **Additional context**
 Add any other context about the problem here.

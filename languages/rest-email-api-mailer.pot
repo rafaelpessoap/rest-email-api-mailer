@@ -2,9 +2,9 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: REST Email API Mailer 2.1.0\n"
+"Project-Id-Version: REST Email API Mailer 2.2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/rafaelpessoap/rest-email-api-mailer/issues\n"
-"POT-Creation-Date: 2026-05-07 12:00+0000\n"
+"POT-Creation-Date: 2026-05-12 12:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,10 +38,10 @@ msgstr ""
 msgid "API Key"
 msgstr ""
 
-msgid "Defined via CYBERPANEL_EMAIL_API_KEY in wp-config.php"
+msgid "Defined via RESTEMAP_API_KEY in wp-config.php"
 msgstr ""
 
-msgid "API key created in your Cyberpanel account. For extra security, define CYBERPANEL_EMAIL_API_KEY in wp-config.php instead of storing it in the database."
+msgid "API key created in your Cyberpanel account. For extra security, define RESTEMAP_API_KEY in wp-config.php instead of storing it in the database."
 msgstr ""
 
 msgid "Sender Email"

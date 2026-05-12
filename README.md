@@ -19,8 +19,8 @@ I run several WordPress sites on servers managed with Cyberpanel and wanted to u
 - **Account dashboard** — plan, monthly limit, emails sent/remaining, reputation score, rate limits, verified domains, monthly delivered/bounced/opened/clicked.
 - **Activity log** — last 30 events with colored status (SENT / DELIVERED / ERROR / BOUNCE / EXPIRED / TIMEOUT).
 - **Safe fallback** — when the plugin toggle is off, WordPress keeps using its default PHPMailer-backed mailer.
-- **API key via constant** — define `CYBERPANEL_EMAIL_API_KEY` in `wp-config.php` to keep the secret out of the database.
-- **Protected log file** — logs live under `wp-content/uploads/cyberpanel-email/cyberpanel-email.log.php` starting with a `<?php exit; ?>` guard (safe on Apache, Nginx and LiteSpeed), plus redundant `.htaccess`, `web.config` and `index.php` rules for defense in depth.
+- **API key via constant** — define `RESTEMAP_API_KEY` in `wp-config.php` to keep the secret out of the database.
+- **Protected log file** — logs live under `wp-content/uploads/restemap/restemap.log.php` starting with a `<?php exit; ?>` guard (safe on Apache, Nginx and LiteSpeed), plus redundant `.htaccess`, `web.config` and `index.php` rules for defense in depth.
 - **Internationalization** — English source strings with bundled Brazilian Portuguese (`pt_BR`) translation; ready for more locales.
 
 ## Requirements
@@ -51,7 +51,7 @@ cp -r rest-email-api-mailer /path/to/wp-content/plugins/
 To keep the API key out of the database, define it in `wp-config.php` above the `/* That's all, stop editing! */` line:
 
 ```php
-define( 'CYBERPANEL_EMAIL_API_KEY', 'sk_live_your_key_here' );
+define( 'RESTEMAP_API_KEY', 'sk_live_your_key_here' );
 ```
 
 The plugin prefers the constant over the option value whenever both are present.

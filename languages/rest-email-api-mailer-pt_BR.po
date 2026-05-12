@@ -3,7 +3,7 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: REST Email API Mailer 2.1.0\n"
+"Project-Id-Version: REST Email API Mailer 2.2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/rafaelpessoap/rest-email-api-mailer/issues\n"
 "POT-Creation-Date: 2026-05-07 12:00+0000\n"
 "PO-Revision-Date: 2026-05-07 12:00+0000\n"
@@ -40,11 +40,11 @@ msgstr "Quando desativado, o WordPress usa o método padrão de envio (PHP mail 
 msgid "API Key"
 msgstr "Chave da API"
 
-msgid "Defined via CYBERPANEL_EMAIL_API_KEY in wp-config.php"
-msgstr "Definida via CYBERPANEL_EMAIL_API_KEY no wp-config.php"
+msgid "Defined via RESTEMAP_API_KEY in wp-config.php"
+msgstr "Definida via RESTEMAP_API_KEY no wp-config.php"
 
-msgid "API key created in your Cyberpanel account. For extra security, define CYBERPANEL_EMAIL_API_KEY in wp-config.php instead of storing it in the database."
-msgstr "Chave da API criada na sua conta Cyberpanel. Para maior segurança, defina CYBERPANEL_EMAIL_API_KEY no wp-config.php em vez de armazená-la no banco de dados."
+msgid "API key created in your Cyberpanel account. For extra security, define RESTEMAP_API_KEY in wp-config.php instead of storing it in the database."
+msgstr "Chave da API criada na sua conta Cyberpanel. Para maior segurança, defina RESTEMAP_API_KEY no wp-config.php em vez de armazená-la no banco de dados."
 
 msgid "Sender Email"
 msgstr "Email do remetente"

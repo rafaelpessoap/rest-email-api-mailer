@@ -4,6 +4,26 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-05-12
+
+### Changed
+
+- **Unified plugin-wide prefix to `restemap_` / `Restemap_` / `RESTEMAP_`.** In response to the WordPress.org Plugin Review Team feedback that the plugin was carrying two different prefixes (`cyberpanel_email_*` left over from the previous identity for backward compatibility, plus the new `REST_Email_API_Mailer` class name that started with the common word "rest"), every function, class, constant, option key, cron hook, action handler, nonce and admin-notice transient now uses the same single distinctive prefix.
+- Main class renamed from `REST_Email_API_Mailer` to `Restemap_Plugin`.
+- All seven persisted option keys renamed: `cyberpanel_email_api_key` → `restemap_api_key`, `cyberpanel_email_from_email` → `restemap_from_email`, `cyberpanel_email_from_name` → `restemap_from_name`, `cyberpanel_email_enabled` → `restemap_enabled`, `cyberpanel_email_pending_messages` → `restemap_pending_messages`, `cyberpanel_email_account_stats` → `restemap_account_stats`, `cyberpanel_email_migrated_from_legacy` → `restemap_migrated_from_legacy`.
+- Cron hook renamed from `cyberpanel_email_check_delivery` to `restemap_check_delivery`. The one-time migration unschedules any pending event under the old hook and reschedules it under the new one so delivery tracking never pauses.
+- `admin_post_*` action handlers, nonce action names and per-user admin-notice transients renamed to share the same prefix.
+- Settings group renamed from `cyberpanel_email` to `restemap`, and the settings page menu slug changed from `cyberpanel-api-email` to `restemap`. Bookmarks targeting the old `options-general.php?page=cyberpanel-api-email` URL should be updated.
+- Log directory moved from `wp-content/uploads/cyberpanel-email/` to `wp-content/uploads/restemap/`. The previous directory is not migrated automatically: a fresh log file is started in the new location on first activation, and the old directory (if any) can be left in place or removed manually.
+
+### Removed
+
+- **`CYBERPANEL_EMAIL_API_KEY` wp-config constant.** Replaced by `RESTEMAP_API_KEY`. Database-stored API keys migrate automatically; installs that defined the API key only in `wp-config.php` need to rename the constant once after upgrading (until then the plugin uses the value stored in the database, if any).
+
+### Added
+
+- The one-time migration in `maybe_migrate_legacy_options()` now handles two generations of legacy keys: it copies values from `cyberpanel_email_*` (v2.0.0 – v2.1.0) when present, and also from `cyberpersons_*` (the original pre-2.0.0 internal release) as a fallback. Both sets are deleted after migration so no orphan options are left behind.
+
 ## [2.1.0] - 2026-05-07
 
 ### Changed
